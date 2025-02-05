@@ -1,246 +1,246 @@
-import React, { useState, useRef } from 'react';
-import { Card } from 'primereact/card';
-import { Button } from 'primereact/button';
-import { TabView, TabPanel } from 'primereact/tabview';
-import { InputText } from 'primereact/inputtext';
-import { FileUpload } from 'primereact/fileupload';
-import { Dialog } from 'primereact/dialog';
-import { InputTextarea } from 'primereact/inputtextarea';
+import React, { useState, useRef } from 'react'
+import { Card } from 'primereact/card'
+import { Button } from 'primereact/button'
+import { TabView, TabPanel } from 'primereact/tabview'
+import { InputText } from 'primereact/inputtext'
+import { FileUpload } from 'primereact/fileupload'
+import { Dialog } from 'primereact/dialog'
+import { InputTextarea } from 'primereact/inputtextarea'
 
 const DocumentUpload = () => {
-  const [dialogVisible, setDialogVisible] = useState(false);
-  const [name, setName] = useState('');
-  const [applicants, setApplicants] = useState([]);
-  const [applicantDocuments, setApplicantDocuments] = useState({});
-  const [currentApplicantIndex, setCurrentApplicantIndex] = useState(0);
-  const [currentDocumentIndex, setCurrentDocumentIndex] = useState(0);
-  const [documentName, setDocumentName] = useState('');
-  const [selectedFile, setSelectedFile] = useState(null);
-  const fileUploadRef = useRef(null);
+  const [dialogVisible, setDialogVisible] = useState(false)
+  const [name, setName] = useState('')
+  const [applicants, setApplicants] = useState([])
+  const [applicantDocuments, setApplicantDocuments] = useState({})
+  const [currentApplicantIndex, setCurrentApplicantIndex] = useState(0)
+  const [currentDocumentIndex, setCurrentDocumentIndex] = useState(0)
+  const [documentName, setDocumentName] = useState('')
+  const [selectedFile, setSelectedFile] = useState(null)
+  const fileUploadRef = useRef(null)
   const [addDocumentDialogVisible, setAddDocumentDialogVisible] =
-    useState(false);
-  const [activeTabIndex, setActiveTabIndex] = useState(0); // Add this state
+    useState(false)
+  const [activeTabIndex, setActiveTabIndex] = useState(0)
 
   const handleDeleteApplicant = (index) => {
-    setApplicants(applicants.filter((_, i) => i !== index));
+    setApplicants(applicants.filter((_, i) => i !== index))
     setApplicantDocuments((prevDocuments) => {
-      const newDocuments = { ...prevDocuments };
-      delete newDocuments[index];
-      return newDocuments;
-    });
+      const newDocuments = { ...prevDocuments }
+      delete newDocuments[index]
+      return newDocuments
+    })
     if (index <= currentApplicantIndex && currentApplicantIndex > 0) {
-      setCurrentApplicantIndex(currentApplicantIndex - 1);
-      setActiveTabIndex(currentApplicantIndex - 1); // Update activeTabIndex
+      setCurrentApplicantIndex(currentApplicantIndex - 1)
+      setActiveTabIndex(currentApplicantIndex - 1)
     }
-  };
+  }
 
   const handleAddDocument = (index) => {
-    setCurrentApplicantIndex(index);
-    setActiveTabIndex(index); // Update activeTabIndex
-    setAddDocumentDialogVisible(true);
-  };
+    setCurrentApplicantIndex(index)
+    setActiveTabIndex(index)
+    setAddDocumentDialogVisible(true)
+  }
 
   const handleDeleteDocument = (applicantIndex, documentIndex) => {
     setApplicantDocuments((prevDocuments) => {
-      const newDocuments = { ...prevDocuments };
-      newDocuments[applicantIndex].splice(documentIndex, 1);
-      return newDocuments;
-    });
-  };
+      const newDocuments = { ...prevDocuments }
+      newDocuments[applicantIndex].splice(documentIndex, 1)
+      return newDocuments
+    })
+  }
 
   const handleSaveDocument = () => {
     setApplicantDocuments((prevDocuments) => {
-      const newDocuments = { ...prevDocuments };
+      const newDocuments = { ...prevDocuments }
       if (!newDocuments[currentApplicantIndex]) {
-        newDocuments[currentApplicantIndex] = [];
+        newDocuments[currentApplicantIndex] = []
       }
       const existingDocument = newDocuments[currentApplicantIndex].find(
         (doc) => doc.name === documentName
-      );
+      )
       if (!existingDocument) {
         newDocuments[currentApplicantIndex].push({
           name: documentName,
           file: selectedFile,
-        });
+        })
       }
-      return newDocuments;
-    });
-    setAddDocumentDialogVisible(false);
-    setDocumentName('');
-    setSelectedFile(null);
+      return newDocuments
+    })
+    setAddDocumentDialogVisible(false)
+    setDocumentName('')
+    setSelectedFile(null)
     if (fileUploadRef.current) {
-      fileUploadRef.current.clear();
+      fileUploadRef.current.clear()
     }
-  };
+  }
 
   const onFileSelect = (event) => {
-    setSelectedFile(event.files[0]);
-  };
+    setSelectedFile(event.files[0])
+  }
 
   const onFileRemove = () => {
-    setSelectedFile(null);
-  };
+    setSelectedFile(null)
+  }
 
   const onFileClear = () => {
-    setSelectedFile(null);
-  };
+    setSelectedFile(null)
+  }
 
   const onUpload = () => {
     if (selectedFile) {
-      console.log('File uploaded:', selectedFile);
+      console.log('File uploaded:', selectedFile)
     }
-  };
+  }
 
   const handleNextDocument = () => {
-    const totalApplicants = applicants.length;
+    const totalApplicants = applicants.length
     if (totalApplicants === 0) {
-      return;
+      return
     }
 
-    const currentApplicantDocs = applicantDocuments[currentApplicantIndex] || [];
-    const totalDocsInCurrentApplicant = currentApplicantDocs.length;
+    const currentApplicantDocs = applicantDocuments[currentApplicantIndex] || []
+    const totalDocsInCurrentApplicant = currentApplicantDocs.length
 
     if (totalDocsInCurrentApplicant === 0) {
-      let nextApplicantIndex = (currentApplicantIndex + 1) % totalApplicants;
-      let foundNextApplicant = false;
+      let nextApplicantIndex = (currentApplicantIndex + 1) % totalApplicants
+      let foundNextApplicant = false
       for (let i = 0; i < totalApplicants; i++) {
         if (
           applicantDocuments[nextApplicantIndex] &&
           applicantDocuments[nextApplicantIndex].length > 0
         ) {
-          foundNextApplicant = true;
-          break;
+          foundNextApplicant = true
+          break
         }
-        nextApplicantIndex = (nextApplicantIndex + 1) % totalApplicants;
+        nextApplicantIndex = (nextApplicantIndex + 1) % totalApplicants
       }
       if (foundNextApplicant) {
-        setCurrentApplicantIndex(nextApplicantIndex);
-        setCurrentDocumentIndex(0);
-        setActiveTabIndex(nextApplicantIndex); // Update activeTabIndex
-        return;
+        setCurrentApplicantIndex(nextApplicantIndex)
+        setCurrentDocumentIndex(0)
+        setActiveTabIndex(nextApplicantIndex) // Update activeTabIndex
+        return
       }
     } else if (currentDocumentIndex < totalDocsInCurrentApplicant - 1) {
-      setCurrentDocumentIndex(currentDocumentIndex + 1);
-      return;
+      setCurrentDocumentIndex(currentDocumentIndex + 1)
+      return
     } else {
-      let nextApplicantIndex = (currentApplicantIndex + 1) % totalApplicants;
-      let foundNextApplicant = false;
+      let nextApplicantIndex = (currentApplicantIndex + 1) % totalApplicants
+      let foundNextApplicant = false
       for (let i = 0; i < totalApplicants; i++) {
         if (
           applicantDocuments[nextApplicantIndex] &&
           applicantDocuments[nextApplicantIndex].length > 0
         ) {
-          foundNextApplicant = true;
-          break;
+          foundNextApplicant = true
+          break
         }
-        nextApplicantIndex = (nextApplicantIndex + 1) % totalApplicants;
+        nextApplicantIndex = (nextApplicantIndex + 1) % totalApplicants
       }
       if (foundNextApplicant) {
-        setCurrentApplicantIndex(nextApplicantIndex);
-        setCurrentDocumentIndex(0);
-        setActiveTabIndex(nextApplicantIndex); // Update activeTabIndex
-        return;
+        setCurrentApplicantIndex(nextApplicantIndex)
+        setCurrentDocumentIndex(0)
+        setActiveTabIndex(nextApplicantIndex)
+        return
       } else {
-        setCurrentApplicantIndex(0);
-        setActiveTabIndex(0); // Update activeTabIndex
+        setCurrentApplicantIndex(0)
+        setActiveTabIndex(0)
         if (applicantDocuments[0] && applicantDocuments[0].length > 0) {
-          setCurrentDocumentIndex(0);
+          setCurrentDocumentIndex(0)
         }
-        return;
+        return
       }
     }
-  };
+  }
 
   const handlePreviousDocument = () => {
-    const totalApplicants = applicants.length;
+    const totalApplicants = applicants.length
     if (totalApplicants === 0) {
-      return;
+      return
     }
 
-    const currentApplicantDocs = applicantDocuments[currentApplicantIndex] || [];
-    const totalDocsInCurrentApplicant = currentApplicantDocs.length;
+    const currentApplicantDocs = applicantDocuments[currentApplicantIndex] || []
+    const totalDocsInCurrentApplicant = currentApplicantDocs.length
 
     if (totalDocsInCurrentApplicant === 0) {
       let prevApplicantIndex =
-        (currentApplicantIndex - 1 + totalApplicants) % totalApplicants;
-      let foundPrevApplicant = false;
+        (currentApplicantIndex - 1 + totalApplicants) % totalApplicants
+      let foundPrevApplicant = false
       for (let i = 0; i < totalApplicants; i++) {
         if (
           applicantDocuments[prevApplicantIndex] &&
           applicantDocuments[prevApplicantIndex].length > 0
         ) {
-          foundPrevApplicant = true;
-          break;
+          foundPrevApplicant = true
+          break
         }
         prevApplicantIndex =
-          (prevApplicantIndex - 1 + totalApplicants) % totalApplicants;
+          (prevApplicantIndex - 1 + totalApplicants) % totalApplicants
       }
       if (foundPrevApplicant) {
-        setCurrentApplicantIndex(prevApplicantIndex);
+        setCurrentApplicantIndex(prevApplicantIndex)
         setCurrentDocumentIndex(
           applicantDocuments[prevApplicantIndex].length - 1
-        );
-        setActiveTabIndex(prevApplicantIndex); // Update activeTabIndex
-        return;
+        )
+        setActiveTabIndex(prevApplicantIndex)
+        return
       }
     } else if (currentDocumentIndex > 0) {
-      setCurrentDocumentIndex(currentDocumentIndex - 1);
-      return;
+      setCurrentDocumentIndex(currentDocumentIndex - 1)
+      return
     } else {
       let prevApplicantIndex =
-        (currentApplicantIndex - 1 + totalApplicants) % totalApplicants;
-      let foundPrevApplicant = false;
+        (currentApplicantIndex - 1 + totalApplicants) % totalApplicants
+      let foundPrevApplicant = false
       for (let i = 0; i < totalApplicants; i++) {
         if (
           applicantDocuments[prevApplicantIndex] &&
           applicantDocuments[prevApplicantIndex].length > 0
         ) {
-          foundPrevApplicant = true;
-          break;
+          foundPrevApplicant = true
+          break
         }
         prevApplicantIndex =
-          (prevApplicantIndex - 1 + totalApplicants) % totalApplicants;
+          (prevApplicantIndex - 1 + totalApplicants) % totalApplicants
       }
       if (foundPrevApplicant) {
-        setCurrentApplicantIndex(prevApplicantIndex);
+        setCurrentApplicantIndex(prevApplicantIndex)
         setCurrentDocumentIndex(
           applicantDocuments[prevApplicantIndex].length - 1
-        );
-        setActiveTabIndex(prevApplicantIndex); // Update activeTabIndex
-        return;
+        )
+        setActiveTabIndex(prevApplicantIndex)
+        return
       } else {
-        setCurrentApplicantIndex(totalApplicants - 1);
-        setActiveTabIndex(totalApplicants - 1); // Update activeTabIndex
+        setCurrentApplicantIndex(totalApplicants - 1)
+        setActiveTabIndex(totalApplicants - 1)
         if (
           applicantDocuments[totalApplicants - 1] &&
           applicantDocuments[totalApplicants - 1].length > 0
         ) {
           setCurrentDocumentIndex(
             applicantDocuments[totalApplicants - 1].length - 1
-          );
+          )
         }
-        return;
+        return
       }
     }
-  };
+  }
 
   const getCurrentDocument = () => {
-    const currentApplicantDocs = applicantDocuments[currentApplicantIndex] || [];
-    const document = currentApplicantDocs[currentDocumentIndex];
-    return document;
-  };
+    const currentApplicantDocs = applicantDocuments[currentApplicantIndex] || []
+    const document = currentApplicantDocs[currentDocumentIndex]
+    return document
+  }
 
-  const currentDocument = getCurrentDocument();
+  const currentDocument = getCurrentDocument()
 
   const getDocumentIndicatorStyle = (applicantIndex, docIndex) => {
     if (
       applicantIndex === currentApplicantIndex &&
       docIndex === currentDocumentIndex
     ) {
-      return { color: 'blue' };
+      return { color: 'blue' }
     }
-    return { color: 'black' };
-  };
+    return { color: 'black' }
+  }
 
   return (
     <div className="flex justify-content-center align-items-center gap-3">
@@ -256,7 +256,10 @@ const DocumentUpload = () => {
           </div>
         </div>
         <div className="p-card-content">
-          <TabView activeIndex={activeTabIndex} onTabChange={(e) => setActiveTabIndex(e.index)}>
+          <TabView
+            activeIndex={activeTabIndex}
+            onTabChange={(e) => setActiveTabIndex(e.index)}
+          >
             {applicants.map((applicant, index) => (
               <TabPanel
                 key={index}
@@ -267,8 +270,8 @@ const DocumentUpload = () => {
                       icon="pi pi-trash"
                       className="p-button-rounded p-button-danger p-button-text p-button-sm"
                       onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteApplicant(index);
+                        e.stopPropagation()
+                        handleDeleteApplicant(index)
                       }}
                     />
                   </div>
@@ -287,8 +290,8 @@ const DocumentUpload = () => {
                             icon="pi pi-trash"
                             className="p-button-rounded p-button-danger p-button-text p-button-sm"
                             onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteDocument(index, docIndex);
+                              e.stopPropagation()
+                              handleDeleteDocument(index, docIndex)
                             }}
                           />
                           {doc.name && (
@@ -366,9 +369,9 @@ const DocumentUpload = () => {
               icon="pi pi-check"
               iconPos="left"
               onClick={() => {
-                setApplicants([...applicants, { name }]);
-                setDialogVisible(false);
-                setName('');
+                setApplicants([...applicants, { name }])
+                setDialogVisible(false)
+                setName('')
               }}
             />
           </div>
@@ -440,7 +443,7 @@ const DocumentUpload = () => {
           )}
       </Dialog>
     </div>
-  );
-};
+  )
+}
 
-export default DocumentUpload;
+export default DocumentUpload
