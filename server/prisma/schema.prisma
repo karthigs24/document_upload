@@ -20,8 +20,30 @@ model User {
 }
 
 model Applicant {
-  id         Int     @id @default(autoincrement())
-  name       String
-  userId     Int
-  user       User    @relation(fields: [userId], references: [id])
+  id            Int            @id @default(autoincrement())
+  name          String
+  userId        Int
+  user          User           @relation(fields: [userId], references: [id])
+  documentNames DocumentName[]
+  documents     Document[]     // Add this line for the relation
 }
+
+model DocumentName {
+  id           Int             @id @default(autoincrement())
+  name         String
+  applicantId  Int
+  applicant    Applicant        @relation(fields: [applicantId], references: [id])
+  documents    Document[]
+}
+
+model Document {
+  id             Int            @id @default(autoincrement())
+  name           String
+  type           String
+  url            String
+  documentNameId Int
+  documentName   DocumentName   @relation(fields: [documentNameId], references: [id])
+  applicantId    Int            // Add this line for the relation
+  applicant      Applicant      @relation(fields: [applicantId], references: [id])
+}
+

@@ -21,6 +21,12 @@ const DocumentUpload = () => {
     useState(false)
   const [activeTabIndex, setActiveTabIndex] = useState(0)
 
+  const handleAddDocument = (index) => {
+    setCurrentApplicantIndex(index)
+    setActiveTabIndex(index)
+    setAddDocumentDialogVisible(true)
+  }
+
   const handleDeleteApplicant = (index) => {
     setApplicants(applicants.filter((_, i) => i !== index))
     setApplicantDocuments((prevDocuments) => {
@@ -32,12 +38,6 @@ const DocumentUpload = () => {
       setCurrentApplicantIndex(currentApplicantIndex - 1)
       setActiveTabIndex(currentApplicantIndex - 1)
     }
-  }
-
-  const handleAddDocument = (index) => {
-    setCurrentApplicantIndex(index)
-    setActiveTabIndex(index)
-    setAddDocumentDialogVisible(true)
   }
 
   const handleDeleteDocument = (applicantIndex, documentIndex) => {

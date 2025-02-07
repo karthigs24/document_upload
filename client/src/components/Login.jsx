@@ -7,35 +7,40 @@ import { Button } from 'primereact/button'
 import { Toast } from 'primereact/toast'
 
 const Login = () => {
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const toast = useRef(null)
   const navigate = useNavigate()
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post(
-        'http://localhost:3000/api/auth/login',
-        {
-          username,
-          password,
-        }
-      )
+      const response = await axios.post('http://localhost:3000/login', {
+        email, // Ensure this matches the backend schema
+        password,
+      })
+
       toast.current.show({
         severity: 'success',
         summary: 'Success',
         detail: 'User logged in successfully',
         life: 3000,
       })
+
       console.log('User logged in:', response.data)
       navigate('/document-upload')
     } catch (error) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : 'An error occurred'
+
       toast.current.show({
         severity: 'error',
         summary: 'Error',
-        detail: error.response.data.message,
+        detail: errorMessage,
         life: 3000,
       })
+
       console.error('Error logging in user:', error)
     }
   }
@@ -47,8 +52,8 @@ const Login = () => {
         <label htmlFor="username">Username</label>
         <InputText
           id="username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
       </div>
       <div className="p-field p-col-12">

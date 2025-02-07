@@ -3,13 +3,33 @@ const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { z } = require('zod');
+const multer = require('multer');
+const cors = require('cors');
 require('dotenv').config();
 
 const prisma = new PrismaClient();
 const app = express();
 app.use(express.json());
 
-// JWT authentication middleware
+// CORS configuration
+app.use(cors({
+  origin: 'http://localhost:5173', // Replace with your frontend origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
+
+// Multer setup for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
+
+const upload = multer({ storage: storage });
+
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -131,6 +151,111 @@ app.get('/applicants', authenticateToken, async (req, res) => {
   } catch (err) {
     console.log("Get applicants error:", err);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Add Document Name
+app.post('/add-document-name', authenticateToken, async (req, res) => {
+  const documentNameSchema = z.object({
+    name: z.string(),
+    applicantId: z.number()
+  });
+
+  try {
+    console.log("Request body:", req.body);
+    const validatedData = documentNameSchema.parse({
+      ...req.body,
+      applicantId: parseInt(req.body.applicantId, 10) // Ensure applicantId is parsed as a number
+    });
+    console.log("Validated document name data:", validatedData);
+
+    const documentName = await prisma.documentName.create({
+      data: {
+        name: validatedData.name,
+        applicantId: validatedData.applicantId
+      }
+    });
+
+    console.log("Document name added:", documentName);
+    res.status(201).json({ message: 'Document name added successfully', documentName });
+  } catch (err) {
+    console.log("Add document name error:", err);
+    res.status(400).json({ error: err.errors });
+  }
+});
+
+// Get Documents for Applicant
+app.get('/applicants/:id/documents', authenticateToken, async (req, res) => {
+  const applicantId = parseInt(req.params.id);
+
+  try {
+    console.log("Fetching documents for applicant:", applicantId);
+    const documents = await prisma.document.findMany({
+      where: {
+        applicantId: applicantId
+      }
+    });
+    console.log("Documents fetched:", documents);
+    res.json(documents);
+  } catch (err) {
+    console.log("Get documents error:", err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get Specific Document by ID
+app.get('/documents/:id', authenticateToken, async (req, res) => {
+  const documentId = parseInt(req.params.id);
+
+  try {
+    console.log("Fetching document with ID:", documentId);
+    const document = await prisma.document.findUnique({
+      where: {
+        id: documentId
+      }
+    });
+    if (!document) {
+      return res.status(404).json({ error: 'Document not found' });
+    }
+    console.log("Document fetched:", document);
+    res.json(document);
+  } catch (err) {
+    console.log("Get document error:", err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Add Document
+app.post('/add-document', authenticateToken, upload.single('file'), async (req, res) => {
+  const documentSchema = z.object({
+    name: z.string(),
+    type: z.string(),
+    documentNameId: z.number()
+  });
+
+  try {
+    console.log("Request body:", req.body);
+    const validatedData = documentSchema.parse({
+      ...req.body,
+      documentNameId: parseInt(req.body.documentNameId, 10) // Ensure documentNameId is parsed as a number
+    });
+    console.log("Validated document data:", validatedData);
+
+    const document = await prisma.document.create({
+      data: {
+        name: validatedData.name,
+        type: validatedData.type,
+        url: req.file.path,
+        documentNameId: validatedData.documentNameId,
+        applicantId: req.user.userId // Add applicantId from the authenticated user
+      }
+    });
+
+    console.log("Document added:", document);
+    res.status(201).json({ message: 'Document added successfully', document });
+  } catch (err) {
+    console.log("Add document error:", err);
+    res.status(400).json({ error: err.errors });
   }
 });
 
