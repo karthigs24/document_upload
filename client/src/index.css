@@ -97,36 +97,63 @@ code {
   opacity: 0.6;
 }
 
+/* Target the icon within the danger button */
+.p-button.p-button-danger .p-button-icon.pi-trash { /* More specific selector */
+  /* Remove default button background/border styles */
+  background: transparent;
+  border: none;
+  color: #ffffff; /* Icon color (white) */
+  font-size: 1.2rem; /* Adjust icon size as needed */
+  width: auto; /* Let icon size itself */
+  height: auto;
+  margin: 0; /* Remove default margins */
+}
+
 .p-button.p-button-danger {
-  background: #dc3545;
-  color: #ffffff;
-  border: 1px solid #dc3545;
+    background: #007bff; /* Blue background */
+    color: #ffffff;
+    border: none; /* No border */
+    border-radius: 4px; /* Square/slightly rounded corners - adjust as you like*/
+    padding: 8px 12px; /* Adjust padding for button size */
+    transition: background-color 0.2s, box-shadow 0.2s; /* Smooth transitions */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
 .p-button.p-button-danger:enabled:hover {
-  background: #c82333;
-  color: #ffffff;
-  border-color: #bd2130;
+    background: #0056b3; /* Darker blue on hover */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* Slightly more prominent shadow */
 }
 
 .p-button.p-button-danger:enabled:focus {
-  box-shadow: 0 0 0 0.2rem #f1aeb5;
+  outline: none; /* Remove default outline */
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5); /* Blue focus ring */
 }
 
 .p-button.p-button-danger:enabled:active {
-  background: #c82333;
-  color: #ffffff;
-  border-color: #bd2130;
+    background: #0056b3; /* Darker blue on active */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow back to normal */
 }
 
 .p-button.p-button-danger:disabled {
-  background: #dc3545;
-  color: #ffffff;
-  border: 1px solid #dc3545;
-  opacity: 0.6;
+    background: #007bff; /* Still blue when disabled */
+    color: #ffffff;
+    opacity: 0.6;
+    box-shadow: none; /* Remove shadow when disabled */
+    cursor: default; /* Indicate it's not clickable */
 }
 
-.p-button.p-button-rounded {
+/* Optional: If you want the icon to have a background on hover */
+.p-button.p-button-danger:enabled:hover .p-button-icon.pi-trash {
+  /* background-color: rgba(0, 0, 0, 0.1);  Slightly transparent black */
+  /* border-radius: 50%; /* Make it circular */
+  color: #ffffff;
+}
+
+.p-button-danger .p-button-label {
+    margin-left: 5px; /* Adjust spacing between icon and label */
+}
+
+.p-button.p-button-raised {
   border-radius: 2rem;
 }
 
@@ -227,7 +254,7 @@ code {
   border-radius: 6px;
 }
 
-/* PrimeReact FileUpload */
+PrimeReact FileUpload
 .p-fileupload-content {
   background: #ffffff;
   color: #495057;
@@ -356,17 +383,182 @@ code {
 }
 
 /* Custom styles */
-.document-indicators {
+/* General layout and spacing */
+.flex {
   display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-bottom: 10px;
 }
 
+.justify-content-center {
+  justify-content: center;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-3 {
+  gap: 0.75rem;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.my-3 {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.ml-2 {
+  margin-left: 0.5rem;
+}
+
+.min-w-screen {
+  min-width: 100vw;
+}
+
+/* Document Indicator Styles */
 .document-indicator {
+  transition: color 0.3s ease, background-color 0.3s ease;
   padding: 5px 10px;
-  border: 1px solid black;
-  cursor: pointer;
   border-radius: 5px;
+  cursor: pointer;
 }
 
+.document-indicator.current {
+  color: white;
+  background-color: blue;
+  font-weight: bold;
+}
+
+.document-indicator.not-current {
+  color: blue;
+  background-color: white;
+}
+/* Custom Styles */
+.documents-area {
+  margin-top: 1.5rem;
+}
+
+.ai-style-change-1 {
+  border: 1px solid #0d6efd; /* Bootstrap primary color */
+  border-radius: 0.25rem; /* Typical Bootstrap border-radius */
+  padding: 0.375rem 0.75rem; /* Typical Bootstrap button padding */
+  display: inline-block;
+  text-align: center;
+  text-decoration: none; /* Remove underline from text */
+  cursor: pointer; /* Change cursor to pointer on hover */
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.ai-style-change-1.current {
+  color: white;
+  background-color: blue;
+}
+
+.ai-style-change-1.not-current {
+  color: #0d6efd; /* Bootstrap primary color */
+  background-color: transparent;
+}
+
+
+.p-dialog-mask .p-dialog {
+  display: flex;
+  flex-direction: column;
+  width: 100%; /* Adjust as needed */
+  height: auto;
+  border-radius: 8px; /* Slightly rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  overflow: hidden; /* Prevents content from overflowing rounded corners */
+}
+
+.p-dialog-header {
+  background-color: #f8f9fa; /* Light background for header */
+  padding: 15px 20px;
+  border-bottom: 1px solid #dee2e6; /* Separator line */
+  font-weight: 600; /* Slightly bolder header text */
+  display: flex; /* Use flexbox for header actions */
+  align-items: center;
+  justify-content: space-between; /* Align header actions to right */
+}
+
+.p-dialog-title { /* Style the title specifically if needed */
+  font-size: 1.2rem;
+}
+
+.p-dialog-header .p-dialog-header-icons {
+  display: flex; /* Make sure icons are displayed as a group */
+}
+
+
+.p-dialog-content {
+  padding: 20px;
+  flex-grow: 1;
+  overflow-y: auto; /* Scroll if content overflows */
+}
+
+.p-dialog-content .p-field {
+  margin-bottom: 15px; /* Consistent spacing between form fields */
+}
+
+.p-dialog-content label {
+  font-weight: 500; /* Slightly bolder labels */
+  margin-bottom: 5px;
+  display: block; /* Ensure labels are on their own line */
+}
+
+.p-dialog-content .p-inputtext,
+.p-dialog-content .p-inputtextarea,
+.p-dialog-content .p-dropdown { /* Add dropdown if you have it */
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ced4da; /* Light border */
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+.p-dialog-footer {
+  background-color: #f8f9fa; /* Match header background */
+  padding: 15px 20px;
+  border-top: 1px solid #dee2e6; /* Separator line */
+  display: flex;
+  justify-content: flex-end;
+}
+
+.p-dialog-footer .p-button {
+  margin-left: 10px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* Optional: Style the close icon */
+.p-dialog-header .p-dialog-header-icon {
+  opacity: 0.7; /* Make it a bit less prominent */
+  transition: opacity 0.2s;
+}
+
+.p-dialog-header .p-dialog-header-icon:hover {
+  opacity: 1;
+}
+
+.p-dialog-content .p-inputtextarea {
+  width: 100%;
+  padding: 8px; /* Slightly reduced padding */
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 1rem;
+  resize: vertical; /* Allow vertical resizing only */
+  min-height: 80px; /* Set a minimum height */
+  max-height: 150px; /* Set a maximum height (optional) */
+}

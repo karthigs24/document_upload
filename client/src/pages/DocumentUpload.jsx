@@ -25,6 +25,17 @@ const DocumentUpload = () => {
     setCurrentApplicantIndex(index)
     setActiveTabIndex(index)
     setAddDocumentDialogVisible(true)
+
+    // Set currentDocumentIndex to the *last* index if documents exist, otherwise 0
+    setApplicantDocuments((prevDocuments) => {
+      const newDocuments = { ...prevDocuments }
+      if (newDocuments[index] && newDocuments[index].length > 0) {
+        setCurrentDocumentIndex(newDocuments[index].length) // Index of the *next* potential document
+      } else {
+        setCurrentDocumentIndex(0)
+      }
+      return newDocuments
+    })
   }
 
   const handleDeleteApplicant = (index) => {
@@ -54,17 +65,23 @@ const DocumentUpload = () => {
       if (!newDocuments[currentApplicantIndex]) {
         newDocuments[currentApplicantIndex] = []
       }
+
       const existingDocument = newDocuments[currentApplicantIndex].find(
         (doc) => doc.name === documentName
       )
+
       if (!existingDocument) {
         newDocuments[currentApplicantIndex].push({
           name: documentName,
           file: selectedFile,
         })
+
+        // Update currentDocumentIndex to reflect the newly added document
+        setCurrentDocumentIndex(newDocuments[currentApplicantIndex].length - 1)
       }
       return newDocuments
     })
+
     setAddDocumentDialogVisible(false)
     setDocumentName('')
     setSelectedFile(null)
@@ -224,22 +241,22 @@ const DocumentUpload = () => {
     }
   }
 
-  const getCurrentDocument = () => {
-    const currentApplicantDocs = applicantDocuments[currentApplicantIndex] || []
-    const document = currentApplicantDocs[currentDocumentIndex]
-    return document
-  }
+  // const getCurrentDocument = () => {
+  //   const currentApplicantDocs = applicantDocuments[currentApplicantIndex] || []
+  //   const document = currentApplicantDocs[currentDocumentIndex]
+  //   return document
+  // }
 
-  const currentDocument = getCurrentDocument()
+  // const currentDocument = getCurrentDocument()
 
-  const getDocumentIndicatorStyle = (applicantIndex, docIndex) => {
+  const getDocumentIndicatorClass = (applicantIndex, docIndex) => {
     if (
       applicantIndex === currentApplicantIndex &&
       docIndex === currentDocumentIndex
     ) {
-      return { color: 'blue' }
+      return 'ai-style-change-1 current'
     }
-    return { color: 'black' }
+    return 'ai-style-change-1 not-current'
   }
 
   return (
@@ -268,7 +285,7 @@ const DocumentUpload = () => {
                     {applicant.name}
                     <Button
                       icon="pi pi-trash"
-                      className="p-button-rounded p-button-danger p-button-text p-button-sm"
+                      className="p-button-raised p-button-danger p-button-text p-button-sm"
                       onClick={(e) => {
                         e.stopPropagation()
                         handleDeleteApplicant(index)
@@ -282,40 +299,45 @@ const DocumentUpload = () => {
                   <ul>
                     {applicantDocuments[index].map((doc, docIndex) => (
                       <li key={docIndex} className="flex flex-column gap-2">
-                        <div style={getDocumentIndicatorStyle(index, docIndex)}>
-                          {doc.name}
-                        </div>
-                        <div className="flex align-items-center gap-2">
+                        <div className="flex align-items-center ">
+                          <div
+                            className={getDocumentIndicatorClass(
+                              index,
+                              docIndex
+                            )}
+                          >
+                            {doc.name}
+                          </div>
                           <Button
                             icon="pi pi-trash"
-                            className="p-button-rounded p-button-danger p-button-text p-button-sm"
+                            className="p-button-raised p-button-danger p-button-text p-button-sm ml-2"
                             onClick={(e) => {
                               e.stopPropagation()
                               handleDeleteDocument(index, docIndex)
                             }}
                           />
-                          {doc.name && (
-                            <div className="my-3">
-                              <FileUpload
-                                ref={fileUploadRef}
-                                name="demo[]"
-                                url="./upload"
-                                onSelect={onFileSelect}
-                                onRemove={onFileRemove}
-                                onClear={onFileClear}
-                                onUpload={onUpload}
-                                multiple={false}
-                                accept="image/*"
-                                maxFileSize={1000000}
-                                emptyTemplate={
-                                  <p className="m-0">
-                                    Drag and drop files here to upload.
-                                  </p>
-                                }
-                              />
-                            </div>
-                          )}
                         </div>
+                        {doc.name && (
+                          <div className="my-3">
+                            <FileUpload
+                              ref={fileUploadRef}
+                              name="demo[]"
+                              url="./upload"
+                              onSelect={onFileSelect}
+                              onRemove={onFileRemove}
+                              onClear={onFileClear}
+                              onUpload={onUpload}
+                              multiple={false}
+                              accept="image/*"
+                              maxFileSize={1000000}
+                              emptyTemplate={
+                                <p className="m-0">
+                                  Drag and drop files here to upload.
+                                </p>
+                              }
+                            />
+                          </div>
+                        )}
                       </li>
                     ))}
                   </ul>
