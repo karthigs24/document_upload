@@ -30,12 +30,15 @@ const DocumentUpload = () => {
     setAddDocumentDialogVisible(true);
     setApplicantDocuments((prevDocuments) => {
       const newDocuments = { ...prevDocuments };
-      if (!newDocuments[index]) {
-        newDocuments[index] = [];
+      if (newDocuments[index] && newDocuments[index].length > 0) {
+        setCurrentDocumentIndex(newDocuments[index].length);
+      } else {
+        setCurrentDocumentIndex(0);
       }
       return newDocuments;
     });
   };
+
 
   const handleDeleteApplicant = (index) => {
     setApplicants((prevApplicants) => {
@@ -66,7 +69,7 @@ const DocumentUpload = () => {
         newDocuments[currentApplicantIndex] = [];
       }
       const newDocument = {
-        id: new Date().getTime(), 
+        id: new Date().getTime(),
         name: documentName,
         file: selectedFile,
       };
