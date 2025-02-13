@@ -235,10 +235,18 @@ app.post('/add-document', authenticateToken, upload.single('file'), async (req, 
 
   try {
     console.log("Request body:", req.body);
+
+    // Ensure documentNameId is correctly parsed as a number
+    const parsedDocumentNameId = parseInt(req.body.documentNameId, 10);
+    if (isNaN(parsedDocumentNameId)) {
+      throw new Error("Invalid documentNameId: Expected a number");
+    }
+
     const validatedData = documentSchema.parse({
       ...req.body,
-      documentNameId: parseInt(req.body.documentNameId, 10) // Ensure documentNameId is parsed as a number
+      documentNameId: parsedDocumentNameId
     });
+
     console.log("Validated document data:", validatedData);
 
     const document = await prisma.document.create({
@@ -247,7 +255,7 @@ app.post('/add-document', authenticateToken, upload.single('file'), async (req, 
         type: validatedData.type,
         url: req.file.path,
         documentNameId: validatedData.documentNameId,
-        applicantId: req.user.userId // Add applicantId from the authenticated user
+        applicantId: req.user.userId // Use applicantId from the authenticated user
       }
     });
 
@@ -255,9 +263,54 @@ app.post('/add-document', authenticateToken, upload.single('file'), async (req, 
     res.status(201).json({ message: 'Document added successfully', document });
   } catch (err) {
     console.log("Add document error:", err);
-    res.status(400).json({ error: err.errors });
+    res.status(400).json({ error: err.message });
   }
 });
+
+//delete applicant
+app.delete('/applicants/:id', authenticateToken, async (req, res) => {
+  const applicantId = parseInt(req.params.id);
+
+  try {
+    console.log("Deleting applicant with ID:", applicantId);
+
+    // Delete the applicant
+    const deletedApplicant = await prisma.applicant.delete({
+      where: {
+        id: applicantId
+      }
+    });
+
+    console.log("Applicant deleted:", deletedApplicant);
+    res.json({ message: 'Applicant deleted successfully', applicant: deletedApplicant });
+  } catch (err) {
+    console.log("Delete applicant error:", err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+//delete document 
+app.delete('/documents/:id', authenticateToken, async (req, res) => {
+  const documentId = parseInt(req.params.id);
+
+  try {
+    console.log("Deleting document with ID:", documentId);
+
+    // Delete the document
+    const deletedDocument = await prisma.document.delete({
+      where: {
+        id: documentId
+      }
+    });
+
+    console.log("Document deleted:", deletedDocument);
+    res.json({ message: 'Document deleted successfully', document: deletedDocument });
+  } catch (err) {
+    console.log("Delete document error:", err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 // Start the server
 const PORT = process.env.PORT || 3000;
